@@ -6,7 +6,7 @@ const Header = () => {
   return (
     <header className="flex justify-between">
       <Link to={"/"} className="flex items-center gap-2">
-        <img src="/../client/icon.png" alt="icon" className="w-8 h-8" />
+        <img src="/icon.png" alt="icon" className="w-8 h-8" />
         <span className="font-bold text-xl">VacationVibe</span>
       </Link>
       <div className="flex gap-2 border border-gray-300 rounded-full py-2 px-4 shadow-md shadow-gray-300 ">
