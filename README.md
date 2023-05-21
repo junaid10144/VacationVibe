@@ -8,11 +8,7 @@ VacationVibe is a Full Stack Booking App that enables users to book vacation ren
 
 [**Visit Website for Live Demo**](https://vacation-vibe.vercel.app/)
 
-[![Start Your Vacation Adventure](https://png.pngtree.com/png-vector/20220521/ourlarge/pngtree-watch-live-badge-stream-tv-png-image_4666857.png)](https://vacation-vibe.vercel.app/)
-
-[![Start Your Vacation Adventure](https://png.pngtree.com/png-vector/20220521/ourlarge/pngtree-watch-live-badge-stream-tv-png-image_4666864.png)](https://vacation-vibe.vercel.app/)
-
-[![Start Your Vacation Adventure](https://png.pngtree.com/png-vector/20230306/ourlarge/pngtree-transparent-watch-now-banner-design-vector-png-image_6634579.png)](https://vacation-vibe.vercel.app/)
+[![Start Your Vacation Adventure](https://cdn.pixabay.com/photo/2019/06/25/12/59/click-here-4298145_960_720.png)](https://vacation-vibe.vercel.app/)
 
 ## Key Features
 
