@@ -2,7 +2,9 @@
 
 VacationVibe is a Full Stack Booking App that enables users to book vacation rentals, providing a seamless experience for reserving accommodations. The app allows users to create listings for their own properties, giving property owners the opportunity to showcase their rentals to potential guests. With VacationVibe, users can easily search for available properties, view property details, make bookings, and manage their reservations.
 
-[![Start Your Vacation Adventure](https://cdn.pixabay.com/photo/2023/04/22/04/40/live-streaming-7943006_960_720.png)](https://vacation-vibe.vercel.app/)
+**To experience VacationVibe firsthand, please visit our website for a live demo:**
+
+[![Visit Website for Live Demo](https://i.gifer.com/LRPH.gif)](https://vacation-vibe.vercel.app/)
 
 ## Key Features
 
