@@ -5,18 +5,31 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const imageDownloader = require("image-downloader");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+//const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const fs = require('fs');
 const multer = require("multer");
-const fs = require("fs");
 const mime = require("mime-types");
 const User = require("./models/User");
 const Place = require("./models/Place");
 const Booking = require("./models/Booking");
 require("dotenv").config();
+const admin = require('firebase-admin');
+
+// Decode the Base64 string back to JSON
+const serviceAccountBase64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
+const serviceAccountJson = Buffer.from(serviceAccountBase64, 'base64').toString('utf8');
+const serviceAccount = JSON.parse(serviceAccountJson);
+//const serviceAccount = require('./firebase-adminsdk.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+});
 
 const bcryptSalt = bcrypt.genSaltSync(10);
 const jwtSecret = "WU6Ex4KaMD1rT85GVXxqLTq5G&UK8mPqYwUe$RMm";
-const bucket = process.env.S3_BUCKET;
+// const bucket = process.env.S3_BUCKET;
+const bucket = admin.storage().bucket();
 
 const app = express();
 
@@ -31,28 +44,51 @@ app.use(
   })
 );
 
-async function uploadToS3(path, originalFilename, mimetype) {
-  const client = new S3Client({
-    region: process.env.S3_REGION,
-    credentials: {
-      accessKeyId: process.env.S3_ACCESS_KEY,
-      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-    },
-  });
+async function uploadToFirebaseStorage(localFilePath, originalFilename, mimetype) {
   const parts = originalFilename.split(".");
   const ext = parts[parts.length - 1];
   const newFilename = Date.now() + "." + ext;
-  await client.send(
-    new PutObjectCommand({
-      Bucket: bucket,
-      Body: fs.readFileSync(path),
-      Key: newFilename,
-      ContentType: mimetype,
-      ACL: "public-read",
-    })
-  );
-  return `https://${bucket}.s3.amazonaws.com/${newFilename}`;
+
+  const destination = `uploads/${newFilename}`;
+  const file = bucket.file(destination);
+
+  await bucket.upload(localFilePath, {
+    destination,
+    metadata: {
+      contentType: mimetype,
+    },
+  });
+
+  // Make the file publically accessible
+  await file.makePublic();
+
+  // Return the public URL
+  return file.publicUrl();
 }
+
+
+// async function uploadToS3(path, originalFilename, mimetype) {
+//   const client = new S3Client({
+//     region: process.env.S3_REGION,
+//     credentials: {
+//       accessKeyId: process.env.S3_ACCESS_KEY,
+//       secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+//     },
+//   });
+//   const parts = originalFilename.split(".");
+//   const ext = parts[parts.length - 1];
+//   const newFilename = Date.now() + "." + ext;
+//   await client.send(
+//     new PutObjectCommand({
+//       Bucket: bucket,
+//       Body: fs.readFileSync(path),
+//       Key: newFilename,
+//       ContentType: mimetype,
+//       ACL: "public-read",
+//     })
+//   );
+//   return `https://${bucket}.s3.amazonaws.com/${newFilename}`;
+// }
 
 function getUserDataFromToken(req) {
   return new Promise((resolve, reject) => {
@@ -136,7 +172,12 @@ app.post("/api/upload-by-link", async (req, res) => {
     url: link,
     dest: "/tmp/" + newName,
   });
-  const url = await uploadToS3(
+  // const url = await uploadToS3(
+  //   "/tmp/" + newName,
+  //   newName,
+  //   mime.lookup("/tmp/" + newName)
+  // );
+  const url = await uploadToFirebaseStorage(
     "/tmp/" + newName,
     newName,
     mime.lookup("/tmp/" + newName)
@@ -153,7 +194,8 @@ app.post(
     const uploadFiles = [];
     for (let i = 0; i < req.files.length; i++) {
       const { path, originalname, mimetype } = req.files[i];
-      const url = await uploadToS3(path, originalname, mimetype);
+      //const url = await uploadToS3(path, originalname, mimetype);
+      const url = await uploadToFirebaseStorage(path, originalname, mimetype);
       uploadFiles.push(url);
     }
     res.json(uploadFiles);
